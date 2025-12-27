@@ -3,9 +3,10 @@ import mediapipe as mp
 from mediapipe import tasks
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-import sounddevice as sd
-import numpy as np
-import threading
+from audio_synth import AudioSynthesizer
+
+#Audio processing import
+from audio_synth import audio_callback
 
 # Working in 4th/5th octave range
 NOTE_FREQS = {
@@ -13,60 +14,10 @@ NOTE_FREQS = {
     'A4': 440.00, 'B4': 493.88, 'C5': 523.25, 'D5': 587.33, 'E5': 659.25
 }
 
-audio_lock = threading.Lock()
 left_freq = None
 right_freq = None
 
-SAMPLE_RATE = 44100     # this is like framerate for audio (samples per second)
-AMPLITUDE = 0.2         # volume
-
-left_phase = 0.0
-right_phase = 0.0
-
-
-def audio_callback(outdata, frames, time, status):
-    """This function is called by sounddevice to fill the audio buffer"""
-    global left_freq, right_freq, left_phase, right_phase
-    
-    if status:
-        print(status)
-    
-    with audio_lock:
-        l_freq = left_freq
-        r_freq = right_freq
-    
-    # Generate time array for this chunk
-    t = np.arange(frames) / SAMPLE_RATE
-    
-    output = np.zeros(frames)
-    
-    # Generate left hand note
-    # Currently using a sine wave formula
-    if l_freq:
-        left_wave = AMPLITUDE * np.sin(2 * np.pi * l_freq * t + left_phase)
-        output += left_wave
-        # Update phase for next callback (keep it continuous)
-        left_phase = (left_phase + 2 * np.pi * l_freq * frames / SAMPLE_RATE) % (2 * np.pi)
-    else:
-        # Reset phase when note stops (prevents phase accumulation)
-        left_phase = 0.0
-    
-    # Generate right hand note
-    if r_freq:
-        right_wave = AMPLITUDE * np.sin(2 * np.pi * r_freq * t + right_phase)
-        output += right_wave
-        # Update phase for next callback
-        right_phase = (right_phase + 2 * np.pi * r_freq * frames / SAMPLE_RATE) % (2 * np.pi)
-    else:
-        # Reset phase when note stops
-        right_phase = 0.0
-    
-    # Write to output buffer (speakers)
-    outdata[:, 0] = output
-
 def main():
-    global left_freq, right_freq
-    
     # Initialize MediaPipe
     base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
     options = vision.HandLandmarkerOptions(
@@ -78,14 +29,9 @@ def main():
     )
     detector = vision.HandLandmarker.create_from_options(options)
     
-    # Start audio stream
-    stream = sd.OutputStream(
-        channels=1,
-        callback=audio_callback,
-        samplerate=SAMPLE_RATE,
-        blocksize=2048
-    )
-    stream.start()
+    # Initialize and start audio synthesizer
+    synth = AudioSynthesizer(sample_rate=44100, amplitude=0.2, blocksize=2048)
+    synth.start()
     
     # Start webcam
     cap = cv2.VideoCapture(0)
@@ -182,12 +128,8 @@ def main():
                         y = int(landmark.y * frame.shape[0])
                         cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
 
-            # Update audio frequencies (thread-safe)
-            with audio_lock:
-                left_freq = left_note
-                right_freq = right_note
-            
-            # Display notes status on screen
+            synth.set_notes(left_note, right_note)
+
             left_note_name = [k for k, v in NOTE_FREQS.items() if v == left_note]
             right_note_name = [k for k, v in NOTE_FREQS.items() if v == right_note]
             
@@ -204,8 +146,7 @@ def main():
     
     finally:
         # Cleanup
-        stream.stop()
-        stream.close()
+        synth.stop()
         cap.release()
         cv2.destroyAllWindows()
 
