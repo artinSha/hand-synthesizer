@@ -84,9 +84,14 @@ class AudioSynthesizer:
             # Using instantaneous frequency + vibrato to compute phase increments
             phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate
             phases = self.left_phase + np.cumsum(phase_increments)
-            #left_wave = self.amplitude * np.sin(phases)
-            left_wave = self.amplitude * (2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1)
+            #left_wave = self.amplitude * np.sin(phases) SINE WAVE
+            #left_wave = self.amplitude * (2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1) TRIANGLE WAVE
+            left_wave = self.amplitude * np.tanh(2.0 * np.sin(phases)) #COMPLEX WAVE            
             
+            # triangle = 2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1
+            # sine = np.sin(phases)
+            # left_wave = self.amplitude * (0.7 * triangle + 0.3 * sine)
+
             output += left_wave
             
             # Update phase and current frequency
@@ -129,11 +134,14 @@ class AudioSynthesizer:
             freq_array_with_vibrato = freq_array * vibrato_modulation
 
             # Generate wave with gliding frequency + vibrato
-            phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate  # ✅ CORRECT
+            phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate
             phases = self.right_phase + np.cumsum(phase_increments)
-            #right_wave = self.amplitude * np.sin(phases)
-            right_wave = self.amplitude * (2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1)
-            
+            #right_wave = self.amplitude * (2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1)
+            #right_wave = self.amplitude * np.tanh(2.0 * np.sin(phases))  #COMPLEX WAVE
+
+            triangle = 2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1
+            sine = np.sin(phases)
+            right_wave = self.amplitude * (0.7 * triangle + 0.3 * sine)
             output += right_wave
             
             # Update phase and current frequency
