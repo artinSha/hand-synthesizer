@@ -47,12 +47,31 @@ while cap.isOpened():
                 x = int(landmark.x * frame.shape[1])
                 y = int(landmark.y * frame.shape[0])
                 cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
-            
-            # Draw connections (you'll need to define these)
-            # For now, just showing the points
-    
+
+                    
+    if results.handedness: 
+        for idx, hand in enumerate(results.hand_landmarks):
+            # Get hand type (right, left)
+            hand_type = results.handedness[idx][0].category_name
+
+            # NOTE: Need to flip handedness logic due to selfie view
+            # The following chunk is actually for Left hand due to the flip
+            if hand_type == "Right":
+                pinky_tip = hand[20]
+                pinky_pip = hand[18]  # Middle joint
+                
+                # Check if pinky is up
+                pinky_up = pinky_tip.y < pinky_pip.y
+                
+                if pinky_up:
+                    print("LEFT PINKY UP - would play C4")
+                else:
+                    print("Left pinky down")
+
+
     cv2.imshow('Hand Tracking', frame)
     
+    #Press q to quit
     if cv2.waitKey(5) & 0xFF == ord('q'):
         break
 
