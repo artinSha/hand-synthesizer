@@ -20,9 +20,13 @@ right_freq = None
 SAMPLE_RATE = 44100     # this is like framerate for audio (samples per second)
 AMPLITUDE = 0.2         # volume
 
+left_phase = 0.0
+right_phase = 0.0
+
+
 def audio_callback(outdata, frames, time, status):
     """This function is called by sounddevice to fill the audio buffer"""
-    global left_freq, right_freq
+    global left_freq, right_freq, left_phase, right_phase
     
     if status:
         print(status)
@@ -32,20 +36,30 @@ def audio_callback(outdata, frames, time, status):
         r_freq = right_freq
     
     # Generate time array for this chunk
-    t = (np.arange(frames) + time.outputBufferDacTime * SAMPLE_RATE) / SAMPLE_RATE
+    t = np.arange(frames) / SAMPLE_RATE
     
     output = np.zeros(frames)
     
     # Generate left hand note
     # Currently using a sine wave formula
     if l_freq:
-        left_wave = AMPLITUDE * np.sin(2 * np.pi * l_freq * t)
+        left_wave = AMPLITUDE * np.sin(2 * np.pi * l_freq * t + left_phase)
         output += left_wave
+        # Update phase for next callback (keep it continuous)
+        left_phase = (left_phase + 2 * np.pi * l_freq * frames / SAMPLE_RATE) % (2 * np.pi)
+    else:
+        # Reset phase when note stops (prevents phase accumulation)
+        left_phase = 0.0
     
     # Generate right hand note
     if r_freq:
-        right_wave = AMPLITUDE * np.sin(2 * np.pi * r_freq * t)
+        right_wave = AMPLITUDE * np.sin(2 * np.pi * r_freq * t + right_phase)
         output += right_wave
+        # Update phase for next callback
+        right_phase = (right_phase + 2 * np.pi * r_freq * frames / SAMPLE_RATE) % (2 * np.pi)
+    else:
+        # Reset phase when note stops
+        right_phase = 0.0
     
     # Write to output buffer (speakers)
     outdata[:, 0] = output
