@@ -1,5 +1,9 @@
 # Hand Synthesizer
 
+
+https://github.com/user-attachments/assets/90fe38a3-cab1-45e7-b95f-67ea2b7d190b
+
+
 Hand Synthesizer is a real-time hand gesture–controlled synthesizer built with **Python**, **OpenCV**, and **MediaPipe Tasks**.
 It uses computer vision to track hand and finger movements and maps them to audio parameters such as pitch, volume, and effects.
 
