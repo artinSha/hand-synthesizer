@@ -28,6 +28,9 @@ detector = vision.HandLandmarker.create_from_options(options)
 # Start webcam
 cap = cv2.VideoCapture(0)
 
+left_note = None
+right_note = None
+
 while cap.isOpened():
     success, frame = cap.read()
     if not success:
@@ -80,17 +83,17 @@ while cap.isOpened():
                 
                 # Determine which note (priority: thumb > index > middle > ring > pinky)
                 if thumb_up:
-                    print("LEFT: G4")
+                    left_note = NOTE_FREQS['G4']
                 elif index_up:
-                    print("LEFT: F4")
+                    left_note = NOTE_FREQS['F4']
                 elif middle_up:
-                    print("LEFT: E4")
+                    left_note = NOTE_FREQS['E4']
                 elif ring_up:
-                    print("LEFT: D4")
+                    left_note = NOTE_FREQS['D4']
                 elif pinky_up:
-                    print("LEFT: C4")
+                    left_note = NOTE_FREQS['C4']
                 else:
-                    print("LEFT: silence")
+                    left_note = None
 
             elif hand_type == "Left":
                 thumb_tip, thumb_ip = hand[4], hand[3]
@@ -108,18 +111,21 @@ while cap.isOpened():
                 
                 # Priority is reversed for right hand
                 if pinky_up:
-                    print("RIGHT: E5")
+                    right_note = NOTE_FREQS['E5']
                 elif ring_up:
-                    print("RIGHT: D5")
+                    right_note = NOTE_FREQS['D5']
                 elif middle_up:
-                    print("RIGHT: C5")
+                    right_note = NOTE_FREQS['C5']
                 elif index_up:
-                    print("RIGHT: B4")
+                    right_note = NOTE_FREQS['B4']
                 elif thumb_up:
-                    print("RIGHT: A4")
+                    right_note = NOTE_FREQS['A4']
                 else:
-                    print("RIGHT: silence")
+                    right_note = None
 
+        print(f"Playing: Left={left_note}Hz, Right={right_note}Hz")
+
+        
     cv2.imshow('Hand Tracking', frame)
     
     #Press q to quit
