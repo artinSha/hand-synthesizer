@@ -167,12 +167,22 @@ def main():
                         x = int(landmark.x * frame.shape[1])
                         y = int(landmark.y * frame.shape[0])
                         cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
-            
+
             # Update audio frequencies (thread-safe)
             with audio_lock:
                 left_freq = left_note
                 right_freq = right_note
             
+            # Display notes status on screen
+            left_note_name = [k for k, v in NOTE_FREQS.items() if v == left_note]
+            right_note_name = [k for k, v in NOTE_FREQS.items() if v == right_note]
+            
+            status_left = f"Left: {left_note_name[0] if left_note_name else 'silence'}"
+            status_right = f"Right: {right_note_name[0] if right_note_name else 'silence'}"
+            
+            cv2.putText(frame, status_left, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(frame, status_right, (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                
             cv2.imshow('Hand Synthesizer', frame)
             
             if cv2.waitKey(5) & 0xFF == ord('q'):
