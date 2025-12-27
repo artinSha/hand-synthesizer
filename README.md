@@ -1,6 +1,6 @@
 # Hand Synthesizer
 
-
+**Sound ON — this demo includes audio**
 https://github.com/user-attachments/assets/90fe38a3-cab1-45e7-b95f-67ea2b7d190b
 
 
