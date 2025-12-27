@@ -3,7 +3,7 @@ import numpy as np
 import threading
 
 class AudioSynthesizer:
-    def __init__(self, sample_rate=44100, amplitude=0.2, blocksize=2048, glide_time=0.1):
+    def __init__(self, sample_rate=44100, amplitude=0.2, blocksize=2048, glide_time=0.1, vibrato_rate=5.0, vibrato_depth=0.003):
         """Initialize the audio synthesizer
         
             Args:
@@ -16,7 +16,9 @@ class AudioSynthesizer:
         self.amplitude = amplitude
         self.blocksize = blocksize
         self.glide_time = glide_time
-        
+        self.vibrato_rate = vibrato_rate
+        self.vibrato_depth = vibrato_depth
+
         # Shared state (thread-safe)
         self.audio_lock = threading.Lock()
         self.left_freq = None
@@ -26,6 +28,9 @@ class AudioSynthesizer:
         self.left_phase = 0.0
         self.right_phase = 0.0
         
+        self.left_vibrato_phase = 0.0
+        self.right_vibrato_phase = 0.0
+
         self.current_left_freq = None
         self.current_right_freq = None
 
@@ -67,6 +72,14 @@ class AudioSynthesizer:
             else:
                 freq_array = np.maximum(freq_array, target_left)
             
+            # Generate vibrato LFO (Low Frequency Oscillator)
+            vibrato_phases = self.left_vibrato_phase + 2 * np.pi * self.vibrato_rate * t
+            vibrato_lfo = np.sin(vibrato_phases)
+
+            # Apply vibrato to frequency (multiply by 1 + small variation)
+            vibrato_modulation = 1.0 + (self.vibrato_depth * vibrato_lfo)
+            freq_array_with_vibrato = freq_array * vibrato_modulation
+
             # Generate wave with gliding frequency
             # Using instantaneous frequency
             phase_increments = 2 * np.pi * freq_array / self.sample_rate
@@ -77,12 +90,14 @@ class AudioSynthesizer:
             
             # Update phase and current frequency
             self.left_phase = phases[-1] % (2 * np.pi)
+            self.left_vibrato_phase = vibrato_phases[-1] % (2 * np.pi)
             self.current_left_freq = freq_array[-1]
             
         else:
             # No note - reset
             self.current_left_freq = None
             self.left_phase = 0.0
+            self.left_vibrato_phase = 0.0
         
         #GENERATE RIGHT HAND SOUND 
         if target_right:
@@ -104,6 +119,14 @@ class AudioSynthesizer:
             else:
                 freq_array = np.maximum(freq_array, target_right)
             
+            # Generate vibrato LFO
+            vibrato_phases = self.right_vibrato_phase + 2 * np.pi * self.vibrato_rate * t
+            vibrato_lfo = np.sin(vibrato_phases)
+            
+            # Apply vibrato to frequency
+            vibrato_modulation = 1.0 + (self.vibrato_depth * vibrato_lfo)
+            freq_array_with_vibrato = freq_array * vibrato_modulation
+
             # Generate wave with gliding frequency
             phase_increments = 2 * np.pi * freq_array / self.sample_rate
             phases = self.right_phase + np.cumsum(phase_increments)
@@ -113,12 +136,14 @@ class AudioSynthesizer:
             
             # Update phase and current frequency
             self.right_phase = phases[-1] % (2 * np.pi)
+            self.right_vibrato_phase = vibrato_phases[-1] % (2 * np.pi)
             self.current_right_freq = freq_array[-1]
             
         else:
             # No note - reset
             self.current_right_freq = None
             self.right_phase = 0.0
+            self.right_vibrato_phase = 0.0
         
         # Write to output buffer
         outdata[:, 0] = output
