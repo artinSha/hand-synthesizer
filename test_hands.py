@@ -7,6 +7,13 @@ from mediapipe.tasks.python import vision
 # Download the hand landmarker model first
 # You can download it from: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
 
+
+#Working in 4th/5th octave range
+NOTE_FREQS = {
+    'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00,
+    'A4': 440.00, 'B4': 493.88, 'C5': 523.25, 'D5': 587.33, 'E5': 659.25
+}
+
 # Create hand landmarker
 base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
 options = vision.HandLandmarkerOptions(
