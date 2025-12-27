@@ -57,16 +57,33 @@ while cap.isOpened():
             # NOTE: Need to flip handedness logic due to selfie view
             # The following chunk is actually for Left hand due to the flip
             if hand_type == "Right":
-                pinky_tip = hand[20]
-                pinky_pip = hand[18]  # Middle joint
+                # Get all finger landmarks
+                thumb_tip, thumb_ip = hand[4], hand[3]
+                index_tip, index_pip = hand[8], hand[6]
+                middle_tip, middle_pip = hand[12], hand[10]
+                ring_tip, ring_pip = hand[16], hand[14]
+                pinky_tip, pinky_pip = hand[20], hand[18]
                 
-                # Check if pinky is up
+                # Check each finger (thumb is special - horizontal movement)
+                thumb_up = thumb_tip.x < thumb_ip.x  # Left thumb points left
+                index_up = index_tip.y < index_pip.y
+                middle_up = middle_tip.y < middle_pip.y
+                ring_up = ring_tip.y < ring_pip.y
                 pinky_up = pinky_tip.y < pinky_pip.y
                 
-                if pinky_up:
-                    print("LEFT PINKY UP - would play C4")
+                # Determine which note (priority: thumb > index > middle > ring > pinky)
+                if thumb_up:
+                    print("LEFT: G4")
+                elif index_up:
+                    print("LEFT: F4")
+                elif middle_up:
+                    print("LEFT: E4")
+                elif ring_up:
+                    print("LEFT: D4")
+                elif pinky_up:
+                    print("LEFT: C4")
                 else:
-                    print("Left pinky down")
+                    print("LEFT: silence")
 
 
     cv2.imshow('Hand Tracking', frame)
