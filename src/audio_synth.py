@@ -3,7 +3,7 @@ import numpy as np
 import threading
 
 class AudioSynthesizer:
-    def __init__(self, sample_rate=44100, amplitude=0.2, blocksize=2048, glide_time=0.1, vibrato_rate=5.0, vibrato_depth=0.003):
+    def __init__(self, sample_rate=44100, amplitude=0.2, blocksize=2048, glide_time=0.1, vibrato_rate=5.0, vibrato_depth=0.009):
         """Initialize the audio synthesizer
         
             Args:
@@ -84,7 +84,8 @@ class AudioSynthesizer:
             # Using instantaneous frequency + vibrato to compute phase increments
             phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate
             phases = self.left_phase + np.cumsum(phase_increments)
-            left_wave = self.amplitude * np.sin(phases)
+            #left_wave = self.amplitude * np.sin(phases)
+            left_wave = self.amplitude * (2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1)
             
             output += left_wave
             
@@ -130,7 +131,8 @@ class AudioSynthesizer:
             # Generate wave with gliding frequency + vibrato
             phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate  # ✅ CORRECT
             phases = self.right_phase + np.cumsum(phase_increments)
-            right_wave = self.amplitude * np.sin(phases)
+            #right_wave = self.amplitude * np.sin(phases)
+            right_wave = self.amplitude * (2 * np.abs(2 * (phases / (2*np.pi) % 1) - 1) - 1)
             
             output += right_wave
             
