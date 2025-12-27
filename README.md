@@ -1,7 +1,10 @@
 # Hand Synthesizer
 
 **Sound ON — this demo includes audio**
-https://github.com/user-attachments/assets/90fe38a3-cab1-45e7-b95f-67ea2b7d190b
+
+
+https://github.com/user-attachments/assets/2d548749-17c4-44de-9ad9-512576c069b0
+
 
 
 Hand Synthesizer is a real-time hand gesture–controlled synthesizer built with **Python**, **OpenCV**, and **MediaPipe Tasks**.
