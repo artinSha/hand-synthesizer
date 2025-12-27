@@ -65,7 +65,7 @@ while cap.isOpened():
                 pinky_tip, pinky_pip = hand[20], hand[18]
                 
                 # Check each finger (thumb is special - horizontal movement)
-                thumb_up = thumb_tip.x < thumb_ip.x  # Left thumb points left
+                thumb_up = thumb_tip.x > thumb_ip.x  # Left thumb points left
                 index_up = index_tip.y < index_pip.y
                 middle_up = middle_tip.y < middle_pip.y
                 ring_up = ring_tip.y < ring_pip.y
@@ -85,6 +85,33 @@ while cap.isOpened():
                 else:
                     print("LEFT: silence")
 
+            elif hand_type == "Left":
+                thumb_tip, thumb_ip = hand[4], hand[3]
+                index_tip, index_pip = hand[8], hand[6]
+                middle_tip, middle_pip = hand[12], hand[10]
+                ring_tip, ring_pip = hand[16], hand[14]
+                pinky_tip, pinky_pip = hand[20], hand[18]
+                
+                
+                thumb_up = thumb_tip.x < thumb_ip.x
+                index_up = index_tip.y < index_pip.y
+                middle_up = middle_tip.y < middle_pip.y
+                ring_up = ring_tip.y < ring_pip.y
+                pinky_up = pinky_tip.y < pinky_pip.y
+                
+                # Priority is reversed for right hand
+                if pinky_up:
+                    print("RIGHT: E5")
+                elif ring_up:
+                    print("RIGHT: D5")
+                elif middle_up:
+                    print("RIGHT: C5")
+                elif index_up:
+                    print("RIGHT: B4")
+                elif thumb_up:
+                    print("RIGHT: A4")
+                else:
+                    print("RIGHT: silence")
 
     cv2.imshow('Hand Tracking', frame)
     
