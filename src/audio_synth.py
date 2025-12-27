@@ -3,7 +3,7 @@ import numpy as np
 import threading
 
 class AudioSynthesizer:
-    def __init__(self, sample_rate=44100, amplitude=0.2, blocksize=2048, glide_time=0.3):
+    def __init__(self, sample_rate=44100, amplitude=0.2, blocksize=2048, glide_time=0.1):
         """Initialize the audio synthesizer
         
             Args:

@@ -5,10 +5,10 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from audio_synth import AudioSynthesizer
 
-# Working in 4th/5th octave range
+# Working in 3rd, 4th octave range
 NOTE_FREQS = {
-    'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00,
-    'A4': 440.00, 'B4': 493.88, 'C5': 523.25, 'D5': 587.33, 'E5': 659.25
+    'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00,
+    'A3': 220.00, 'B3': 246.94, 'C4': 261.63, 'D4': 293.66, 'E4': 329.63
 }
 
 left_freq = None
@@ -34,8 +34,8 @@ def main():
     cap = cv2.VideoCapture(0)
     
     print("Hand Synthesizer Started!")
-    print("Left hand: Pinky=C4, Ring=D4, Middle=E4, Index=F4, Thumb=G4")
-    print("Right hand: Thumb=A4, Index=B4, Middle=C5, Ring=D5, Pinky=E5")
+    print("Left hand: Pinky=C3, Ring=D3, Middle=E3, Index=F3, Thumb=G3")
+    print("Right hand: Thumb=A3, Index=B3, Middle=C4, Ring=D4, Pinky=E4")
     print("Press 'q' to quit")
     
     try:
@@ -80,15 +80,15 @@ def main():
                         
                         # Determine which note (priority: thumb > index > middle > ring > pinky)
                         if thumb_up:
-                            left_note = NOTE_FREQS['G4']
+                            left_note = NOTE_FREQS['G3']
                         elif index_up:
-                            left_note = NOTE_FREQS['F4']
+                            left_note = NOTE_FREQS['F3']
                         elif middle_up:
-                            left_note = NOTE_FREQS['E4']
+                            left_note = NOTE_FREQS['E3']
                         elif ring_up:
-                            left_note = NOTE_FREQS['D4']
+                            left_note = NOTE_FREQS['D3']
                         elif pinky_up:
-                            left_note = NOTE_FREQS['C4']
+                            left_note = NOTE_FREQS['C3']
                         else:
                             left_note = None
 
@@ -107,15 +107,15 @@ def main():
                         
                         # Priority is reversed for right hand
                         if pinky_up:
-                            right_note = NOTE_FREQS['E5']
+                            right_note = NOTE_FREQS['E4']
                         elif ring_up:
-                            right_note = NOTE_FREQS['D5']
+                            right_note = NOTE_FREQS['D4']
                         elif middle_up:
-                            right_note = NOTE_FREQS['C5']
+                            right_note = NOTE_FREQS['C4']
                         elif index_up:
-                            right_note = NOTE_FREQS['B4']
+                            right_note = NOTE_FREQS['B3']
                         elif thumb_up:
-                            right_note = NOTE_FREQS['A4']
+                            right_note = NOTE_FREQS['A3']
                         else:
                             right_note = None
                     
