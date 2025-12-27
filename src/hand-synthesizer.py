@@ -5,9 +5,6 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from audio_synth import AudioSynthesizer
 
-#Audio processing import
-from audio_synth import audio_callback
-
 # Working in 4th/5th octave range
 NOTE_FREQS = {
     'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00,
