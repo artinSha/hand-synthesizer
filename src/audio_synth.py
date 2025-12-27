@@ -81,8 +81,8 @@ class AudioSynthesizer:
             freq_array_with_vibrato = freq_array * vibrato_modulation
 
             # Generate wave with gliding frequency
-            # Using instantaneous frequency
-            phase_increments = 2 * np.pi * freq_array / self.sample_rate
+            # Using instantaneous frequency + vibrato to compute phase increments
+            phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate
             phases = self.left_phase + np.cumsum(phase_increments)
             left_wave = self.amplitude * np.sin(phases)
             
@@ -127,8 +127,8 @@ class AudioSynthesizer:
             vibrato_modulation = 1.0 + (self.vibrato_depth * vibrato_lfo)
             freq_array_with_vibrato = freq_array * vibrato_modulation
 
-            # Generate wave with gliding frequency
-            phase_increments = 2 * np.pi * freq_array / self.sample_rate
+            # Generate wave with gliding frequency + vibrato
+            phase_increments = 2 * np.pi * freq_array_with_vibrato / self.sample_rate  # ✅ CORRECT
             phases = self.right_phase + np.cumsum(phase_increments)
             right_wave = self.amplitude * np.sin(phases)
             
