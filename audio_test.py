@@ -10,4 +10,4 @@ def play_tone(frequency, duration=1.0):
     sd.wait()
 
 # Test it
-play_tone(261.63)  # Play A4 for 1 second
+play_tone(264.63)  # Play A4 for 1 second
