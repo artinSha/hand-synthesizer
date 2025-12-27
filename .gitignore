@@ -45,14 +45,6 @@ ENV/
 .env
 .env.local
 
-# Audio/Video files (if you're saving recordings)
-*.wav
-*.mp3
-*.mp4
-*.avi
-recordings/
-output/
-
 # Model files (if you download any custom models)
 *.pkl
 *.h5
